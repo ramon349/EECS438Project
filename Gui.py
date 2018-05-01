@@ -17,18 +17,17 @@ import json
 def gen_script(params):
     dummy="""#!/bin/sh
 #SBATCH -c {param[num_cores]}
-#SBATCH --output={param[output_file]}.txt
+#SBATCH --output={param[output_file]}_%A_%a.txt
 #SBATCH --mem={param[mem_size]}gb
 #SBATCH -A eecs438
-#SBATCH --Array=0-{param[cases]}%{param[num_nodes]}
-
-
+#SBATCH --array=0-{param[cases]}%{param[num_nodes]}
 interestDir={param[main_dir]}
 cd $interestDir
+echo "Hello we are interested in the path: ${{interestDir}} "
 module load matlab
-shopt -s nullglob 
+shopt -s nullglob
 patientArray=(*/)
-matlab -r "  fun = @{param[fun_handle]};  fun(${{patientArray[${{SLURM_ARRAY_TASK_ID}}]}});"
+matlab -r " addpath('/home/rlc131/'); setup(); fun = @{param[fun_handle]};  fun('${{patientArray[${{SLURM_ARRAY_TASK_ID}}]}}');"
 quit""".format(param=params)
     return dummy
 
@@ -63,7 +62,10 @@ if __name__ == "__main__":
     count = handler.send_searcher(diag.param_dict['main_dir'])
     diag.addToDict('cases',str(count))
     script = gen_script(diag.param_dict)
-    with open("test.bash",'w') as f:
+    slurm_script = "slurm_script.slurm"
+    root_dir = "/home/{user}/{script}".format(user=handler.user,script=slurm_script)
+    with open(slurm_script, encoding="utf-8",mode='w') as f:
         f.write(script)
    # handler.exec_generator(list(d.get_results() ) )
+    handler.execute_bash(slurm_script,root_dir)
     handler.client.close()

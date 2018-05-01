@@ -27,4 +27,10 @@ class SSHWrapper():
             if 'd' in info: 
                 count = count +1
                 print(e)
-        return count 
+        return count
+    def execute_bash(self,filename,path):
+        ftp = self.client.open_sftp()
+        response = ftp.put(filename,path)
+        self.client.exec_command("dos2unix {f}".format(f=filename))
+        py_command = " sbatch {f}".format(f=filename)
+        (std_in,std_out,std_err) = self.client.exec_command(py_command)  
