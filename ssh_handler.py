@@ -32,5 +32,5 @@ class SSHWrapper():
         ftp = self.client.open_sftp()
         response = ftp.put(filename,path)
         self.client.exec_command("dos2unix {f}".format(f=filename))
-        py_command = " sbatch {f}".format(f=filename)
-        (std_in,std_out,std_err) = self.client.exec_command(py_command)  
+        py_command = "sbatch {f}".format(f=filename)
+        (std_in,std_out,std_err) = self.client.exec_command(py_command) 

@@ -53,7 +53,7 @@ class SlurmDialog(simpledialog.Dialog):
             return SSHWrapper(self.param_dict["user@host"],self.param_dict["password"])
         def addToDict(self,key,value):
             self.param_dict[key] = value
-if __name__ == "__main__":
+if __name__.endswith('__main__'):
     root = tk.Tk()
     diag = SlurmDialog(root)
    # script = gen_script(diag.param_dict)
