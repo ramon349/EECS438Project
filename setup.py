@@ -13,5 +13,6 @@ setup(
     options =  {"build_exe": {"includes": includes, "packages": ['os',"bcrypt","cffi",'paramiko','idna'],"include_files": include_files}},
     version = "<any number>",
     description = '<any description>',
-    executables = executables
+    executables = executables,
+    icon = "futurama_ico.ico"
 )
