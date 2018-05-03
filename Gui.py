@@ -76,4 +76,5 @@ if __name__.endswith('__main__'):
         f.write(script)
    # handler.exec_generator(list(d.get_results() ) )
     handler.execute_bash(slurm_script,root_dir)
+    #handler.get_file("report.csv",diag.param_dict['main_dir'])
     handler.client.close()

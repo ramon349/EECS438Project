@@ -28,7 +28,6 @@ class SSHWrapper():
                 print(e)
         return count
     def execute_bash(self,filename,path):
-        filler =  95
         ftp = self.client.open_sftp()
         response = ftp.put(filename,path)
         self.client.exec_command("dos2unix {f}".format(f=filename))
@@ -44,3 +43,9 @@ class SSHWrapper():
             if len(list(std_out)) ==1:
                 break
             time.sleep(60)
+        ftp = self.client.open_sftp()
+    def get_file(self,filename,path):
+        ftp = self.client.open_sftp()
+        cwd = "{PATH}\\{name}".format(PATH=os.getcwd(),name=filename)
+        fileOfInterest = "{f}/{name}".format(f=path,name=filename)
+        ftp.get(fileOfInterest,cwd)
