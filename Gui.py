@@ -4,35 +4,13 @@ if sys.version_info.major < 3.0:
     import Tkinter as tk
     from Tkinter import filedialog as fd
     from Tkinter import simpledialog
-    from Tkinter import *
 else: 
     import tkinter as tk 
     from tkinter import filedialog as fd
     from tkinter import simpledialog
-    from tkinter import *
 from ssh_handler import SSHWrapper
 import json
-
-
-def gen_script(params):
-    """
-        params(dict): Dictionary containing parameters to place into the string.
-    """
-    template ="""#!/bin/sh
-#SBATCH -c {param[num_cores]}
-#SBATCH --output={param[output_file]}_%A_%a.txt
-#SBATCH --mem={param[mem_size]}gb
-#SBATCH -A eecs438
-#SBATCH --array=0-{param[cases]}%{param[num_nodes]}
-module load matlab
-interestDir={param[main_dir]} 
-cd "$interestDir"
-echo "Hello we are interested in the path: ${{interestDir}}"
-shopt -s nullglob
-patientArray=(*/)
-matlab -r "addpath('/home/rlc131/'); setup(); fun = @{param[fun_handle]};  fun('${{patientArray[${{SLURM_ARRAY_TASK_ID}}]}}'); " """
-    template = template.format(param=params)
-    return template
+from scriptGen import gen_script
 
 class SlurmDialog(simpledialog.Dialog):
     """
@@ -62,7 +40,8 @@ class SlurmDialog(simpledialog.Dialog):
         return SSHWrapper(self.param_dict["user@host"],self.param_dict["password"])
     def addToDict(self,key,value):
         self.param_dict[key] = value
-if __name__.endswith('__main__'):
+
+if __name__.endswith('__main__'): #Note the endswith method was used instead of == based on cxxFreze docs
     root = tk.Tk()
     diag = SlurmDialog(root)
     handler = diag.gen_ssh()
@@ -74,7 +53,6 @@ if __name__.endswith('__main__'):
     root_dir = "/home/{user}/{script}".format(user=handler.user,script=slurm_script)
     with open(slurm_script, encoding="utf-8",mode='w') as f:
         f.write(script)
-   # handler.exec_generator(list(d.get_results() ) )
-    handler.execute_bash(slurm_script,root_dir)
-    #handler.get_file("report.csv",diag.param_dict['main_dir'])
+    handler.transmit_file(slurm_script,root_dir)
+    handler.execute_bash(slurm_script)
     handler.client.close()
